@@ -30,7 +30,9 @@ inputs:
     required: false
     default: 'false'
   save_on_failure:
-    description: 'save the tools/toolchain (and ccache) even if the job failed'
+    description: >-
+      legacy/no-op placeholder — post-if 里读不到 action inputs；
+      请改用作业级环境变量 CACHEWRT_SAVE_ON_FAILURE=true（见 README）
     required: false
     default: 'false'
   extra_paths:
@@ -44,9 +46,10 @@ runs:
   using: 'node24'
   main: 'fetch.js'
   post: 'save.js'
-  # 默认只在 job 成功时保存；save_on_failure=true（或环境变量
-  # CACHEWRT_SAVE_ON_FAILURE=true）时，编译失败也执行 post 保存
-  post-if: "success() || inputs.save_on_failure == 'true' || env.CACHEWRT_SAVE_ON_FAILURE == 'true'"
+  # 默认只在 job 成功时保存；设置作业级环境变量 CACHEWRT_SAVE_ON_FAILURE=true 后，
+  # 编译失败（failure）也会执行 post 保存。注意：post-if 里读不到 action inputs，
+  # 所以开关必须是 env，不能是 with: 输入。
+  post-if: "success() || (failure() && env.CACHEWRT_SAVE_ON_FAILURE == 'true')"
 branding:
   icon: 'archive'
   color: 'gray-dark'
