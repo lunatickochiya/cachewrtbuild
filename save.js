@@ -3,6 +3,7 @@ import * as cache from "@actions/cache";
 import { buildBaseConfig } from "./utils.js";
 
 try {
+    core.debug(`save_on_failure=${core.getBooleanInput("save_on_failure")}`);
     const cleanUpCache = core.getBooleanInput("clean");
     if (cleanUpCache) {
         core.debug("Cache clean requested, skipping save");

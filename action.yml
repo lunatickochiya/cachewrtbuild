@@ -29,6 +29,10 @@ inputs:
     description: 'skip saving'
     required: false
     default: 'false'
+  save_on_failure:
+    description: 'save the tools/toolchain (and ccache) even if the job failed'
+    required: false
+    default: 'false'
   extra_paths:
     description: 'additional cache directories to include (one per line, can specify multiple)'
     required: false
@@ -40,7 +44,9 @@ runs:
   using: 'node24'
   main: 'fetch.js'
   post: 'save.js'
-  post-if: 'success()'
+  # 默认只在 job 成功时保存；save_on_failure=true（或环境变量
+  # CACHEWRT_SAVE_ON_FAILURE=true）时，编译失败也执行 post 保存
+  post-if: "success() || inputs.save_on_failure == 'true' || env.CACHEWRT_SAVE_ON_FAILURE == 'true'"
 branding:
   icon: 'archive'
   color: 'gray-dark'
